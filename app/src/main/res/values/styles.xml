@@ -1,20 +1,70 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.Dribbblestyle">
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Swipeable" parent="Theme.Dribbblestyle">
+        <item name="android:windowContentOverlay">@drawable/bottom_shadow</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+
+    <style name="Translucent" parent="Theme.AppCompat.NoActionBar">
+        <!-- Empty on purpose -->
+    </style>
+
+    <style name="Theme.Dribbblestyle" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="ColonTextView">
+        <item name="android:text">:</item>
+        <item name="android:textColor">#f3f3f3</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:background">#191819</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:translationX">3dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginBottom">3dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="ProfileLabel">
+        <item name="android:background">#191819</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:translationX">3dp</item>
+        <item name="android:layout_marginBottom">3dp</item>
+        <item name="android:layout_toLeftOf">@id/colon1</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
+    <style name="ProfileValue">
+        <item name="android:layout_toRightOf">@id/colon1</item>
+        <item name="android:layout_toEndOf">@id/colon1</item>
+        <item name="android:textColor">@color/dribbble</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:translationX">3dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="StackCardViewStyle" parent="android:Widget.TextView">
+        <item name="cardCornerRadius">2dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
 </resources>

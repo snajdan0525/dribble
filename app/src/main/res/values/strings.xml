@@ -1,8 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">dribble</string>
 
+    <string name="app_name">Dribble</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
+    <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
+    <string name="action_share">Share</string>
+    <string name="title_activity_shot">ShotActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_shots">No shots :(</string>
+    <string name="action_browser">Browser</string>
+    <string name="title_activity_my">MyActivity</string>
+    <string name="title_activity_shot_image">ShotImageActivity</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="log_in">Log in</string>
+    <string name="enter_your_username">Only Dribbble username is required.</string>
+    <string name="dribbble_username">Your Dribbble username</string>
+    <string name="shots_label">SHOTS</string>
+    <string name="likes_label">LIKES</string>
+    <string name="followers_label">FOLLOWERS</string>
+    <string name="following_label">FOLLOWING</string>
+    <string name="rebounds_label">REBOUNDS</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="profile_error">Player not found :(</string>
+    <string name="main_settings">Main</string>
+    <string name="low_traffic_title">Reduce data usage</string>
+    <string name="low_traffic_summary">Fetch smaller images to save bandwidth</string>
+    <string name="log_out">Log out</string>
+    <string name="logged_in_as">Logged in as</string>
+    <string name="clear_cache_title">Clear cache</string>
+    <string name="clear_cache_summary">Delete all images downloaded by the app</string>
+    <string name="other_label">Other</string>
+    <string name="developer">Egor N.</string>
+    <string name="developer_link">https://github.com/egor-n/gunnner</string>
+    <string name="designer">Andrew S.</string>
+    <string name="designer_link">https://dribbble.com/tsunami</string>
+    <string name="search">Search</string>
+
 </resources>

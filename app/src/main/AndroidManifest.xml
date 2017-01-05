@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.snalopainen.dribble">
+<manifest
+    package="com.snalopainen"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name="com.snalopainen.ui.main.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.snalopainen.ui.shots.OpenedShotActivity"
+            android:theme="@style/Swipeable"/>
+        <activity
+            android:name="com.snalopainen.ui.profile.ProfileActivity"
+            android:theme="@style/Swipeable"/>
+        <activity
+            android:name="com.snalopainen.ui.shots.ShotImageActivity"
+            android:theme="@style/Translucent"/>
+        <activity
+            android:name="com.snalopainen.ui.shots.ShotsActivity"
+            android:theme="@style/Swipeable"/>
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="5a3b0203215a43a61151b78162b22359b3acc655"/>
     </application>
 
 </manifest>

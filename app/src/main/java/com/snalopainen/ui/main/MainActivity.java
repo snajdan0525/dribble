@@ -1,0 +1,183 @@
+package com.snalopainen.ui.main;
+
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+
+import com.crashlytics.android.Crashlytics;
+import com.snalopainen.R;
+import com.snalopainen.data.Settings;
+import com.snalopainen.data.UserController;
+import com.snalopainen.data.helpers.Utils;
+import com.snalopainen.data.models.Shot;
+import com.snalopainen.ui.BaseActivity;
+import com.snalopainen.ui.SettingsFragment;
+import com.snalopainen.ui.drawer.NavigationDrawerFragment;
+import com.snalopainen.ui.profile.ProfileFragment;
+import com.snalopainen.ui.shots.ShotsActivity;
+import com.snalopainen.ui.shots.ShotsFragment;
+import com.snalopainen.ui.widgets.InputDialog;
+
+import io.fabric.sdk.android.Fabric;
+/**
+ * @author snalopainen.
+ */
+public class MainActivity extends BaseActivity
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        ShotsFragment.OnShotClickedListener, InputDialog.CustomDialogCallback,
+        MainFragment.SearchListener {
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    private AlertDialog dialog;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
+        Settings.restore(this);
+
+        setContentView(R.layout.activity_main);
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer,
+                (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        switch (position) {
+            case 0:  // main
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new MainFragment())
+                        .commit();
+                break;
+            case 1:  // my profile
+                if (UserController.isLoggedIn(this)) {
+                    setTitle("My profile");
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container,
+                                    ProfileFragment.newInstance(UserController.getName()))
+                            .commit();
+                } else {
+                    showInputDialog(-1);
+                }
+                break;
+            case 2:  // my shots
+                if (UserController.isLoggedIn(this)) {
+                    setTitle("My shots");
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container,
+                                    ShotsFragment.newInstance(ShotsFragment.MY_SHOTS))
+                            .commit();
+                } else {
+                    showInputDialog(ShotsFragment.MY_SHOTS);
+                }
+                break;
+            case 3:  // following
+                if (UserController.isLoggedIn(this)) {
+                    setTitle("Following");
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container,
+                                    ShotsFragment.newInstance(ShotsFragment.FOLLOWING))
+                            .commit();
+                } else {
+                    showInputDialog(ShotsFragment.FOLLOWING);
+                }
+                break;
+            case 4:  // likes
+                if (UserController.isLoggedIn(this)) {
+                    setTitle("Likes");
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container,
+                                    ShotsFragment.newInstance(ShotsFragment.LIKES))
+                            .commit();
+                } else {
+                    showInputDialog(ShotsFragment.LIKES);
+                }
+                break;
+            case 5:  // settings
+                setTitle("Settings");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new SettingsFragment())
+                        .commit();
+                break;
+        }
+    }
+
+    public void setTitle(String s) {
+        getSupportActionBar().setTitle(s);
+    }
+
+    private void showInputDialog(int type) {
+        dialog = new InputDialog(this, type, this);
+        dialog.show();
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (dialog != null) {
+            dialog.dismiss();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            restoreActionBar();
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onShotClicked(Shot shot) {
+        Utils.openShot(this, shot);
+    }
+
+    @Override
+    public void onConfirm(String username, int type) {
+        UserController.setName(MainActivity.this, username);
+        Fragment fragment;
+        if (type == -1) {
+            setTitle("My profile");
+            fragment = ProfileFragment.newInstance(username);
+        } else {
+            if (type == ShotsFragment.MY_SHOTS) {
+                setTitle("My shots");
+            } else if (type == ShotsFragment.FOLLOWING) {
+                setTitle("Following");
+            } else if (type == ShotsFragment.LIKES) {
+                setTitle("Likes");
+            }
+            fragment = ShotsFragment.newInstance(type);
+        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }
+
+    @Override
+    public void onCancel() {
+    }
+
+    @Override
+    public void onSearchQuery(String query) {
+        Utils.hideKeyboard(this);
+        Intent intent = new Intent(this, ShotsActivity.class);
+        intent.putExtra("query", query);
+        startActivity(intent);
+    }
+}
