@@ -3,15 +3,16 @@ package com.snalopainen.ui.shots;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
-import com.snalopainen.data.api.Api;
+import com.snalopainen.data.app.App;
 import com.snalopainen.data.models.Comment;
 import com.snalopainen.data.models.Shot;
 
 import java.util.ArrayList;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 /**
  * @author snalopainen.
@@ -72,40 +73,42 @@ public class OpenedShotController {
             page = 1;
         }
         pages.put(shotId, page);
-        Api.dribbble().comments(shotId, page, new Callback<ArrayList<Comment>>() {
+        App.getClientApi().getDribbbleService().comments(shotId, page).enqueue(new Callback<ArrayList<Comment>>() {
             @Override
-            public void success(ArrayList<Comment> newComments, Response response) {
+            public void onResponse(Call<ArrayList<Comment>> call, Response<ArrayList<Comment>> response) {
                 ArrayList<Comment> commentsList = comments.get(shotId);
                 if (commentsList != null) {
-                    commentsList.addAll(newComments);
+                    commentsList.addAll(response.body());
                 } else {
-                    comments.put(shotId, newComments);
+                    comments.put(shotId, response.body());
                 }
                 if (callbacks.get(shotId) != null) {
-                    callbacks.get(shotId).onCommentsLoaded(newComments.size() > 0, comments.get(shotId)); // TODO
+                    callbacks.get(shotId).onCommentsLoaded(response.body().size() > 0, comments.get(shotId)); // TODO
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ArrayList<Comment>> call, Throwable t) {
+
             }
         });
+
     }
 
     private void loadShot(final int shotId) {
-        Api.dribbble().shot(shotId, new Callback<Shot>() {
+        App.getClientApi().getDribbbleService().shot(shotId).enqueue(new Callback<Shot>() {
             @Override
-            public void success(Shot shot, Response response) {
-                shots.put(shotId, shot);
+            public void onResponse(Call<Shot> call, Response<Shot> response) {
+                shots.put(shotId, response.body());
 
                 if (callbacks.get(shotId) != null) {
-                    callbacks.get(shotId).onShotLoaded(shot);
+                    callbacks.get(shotId).onShotLoaded(response.body());
                     callbacks.get(shotId).onCommentsLoaded(true, comments.get(shotId));
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<Shot> call, Throwable t) {
 
             }
         });

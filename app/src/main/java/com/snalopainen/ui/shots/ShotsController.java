@@ -1,14 +1,16 @@
 package com.snalopainen.ui.shots;
 
 import com.snalopainen.data.api.Api;
+import com.snalopainen.data.app.App;
 import com.snalopainen.data.models.Shot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 /**
  * @author snalopainen.
  */
@@ -53,13 +55,13 @@ public class ShotsController {
         if (!pages.containsKey(reference)) {
             pages.put(reference, 1);
         }
-        Api.dribbble().shots(reference, pages.get(reference), new Callback<ArrayList<Shot>>() {
+        App.getClientApi().getDribbbleService().shots(reference, pages.get(reference)).enqueue(new Callback<ArrayList<Shot>>() {
             @Override
-            public void success(ArrayList<Shot> newShots, Response response) {
+            public void onResponse(Call<ArrayList<Shot>> call, Response<ArrayList<Shot>> response) {
                 if (shots.containsKey(reference)) {
-                    shots.get(reference).addAll(newShots);
+                    shots.get(reference).addAll(response.body());
                 } else {
-                    shots.put(reference, newShots);
+                    shots.put(reference, response.body());
                 }
                 if (callbacks.get(reference) != null) {
                     callbacks.get(reference).onShotsLoaded(shots.get(reference));
@@ -67,12 +69,13 @@ public class ShotsController {
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ArrayList<Shot>> call, Throwable t) {
                 if (callbacks.get(reference) != null) {
                     callbacks.get(reference).onShotsError();
                 }
             }
         });
+
     }
 
     public interface OnShotsLoadedListener {

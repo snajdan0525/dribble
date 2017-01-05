@@ -4,14 +4,16 @@ import android.util.SparseArray;
 import android.util.SparseIntArray;
 
 import com.snalopainen.data.api.Api;
+import com.snalopainen.data.app.App;
 import com.snalopainen.data.models.Shot;
 import com.snalopainen.data.models.User;
 
 import java.util.ArrayList;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 /**
  * @author snalopainen.
@@ -88,40 +90,41 @@ public class ProfileController {
     }
 
     private void loadProfile(final String playerId) {
-        Api.dribbble().userProfile(playerId, new Callback<User>() {
+        App.getClientApi().getDribbbleService().userProfile(playerId).enqueue(new Callback<User>() {
             @Override
-            public void success(User user, Response response) {
-                userProfile = user;
+            public void onResponse(Call<User> call, Response<User> response) {
+                userProfile = response.body();
                 if (userCallback != null) {
-                    userCallback.onPlayerReceived(user);
+                    userCallback.onPlayerReceived(response.body());
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                error.printStackTrace();
+            public void onFailure(Call<User> call, Throwable t) {
+                t.printStackTrace();
                 if (userCallback != null) {
                     userCallback.onPlayerError();
                 }
             }
         });
+
     }
 
     private void loadProfile(final int playerId) {
-        Api.dribbble().userProfile(playerId, new Callback<User>() {
+        App.getClientApi().getDribbbleService().userProfile(playerId).enqueue(new Callback<User>() {
             @Override
-            public void success(User user, Response response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (callbacks.get(playerId) != null) {
-                    callbacks.get(playerId).onPlayerReceived(user);
+                    callbacks.get(playerId).onPlayerReceived(response.body());
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<User> call, Throwable t) {
                 if (callbacks.get(playerId) != null) {
                     callbacks.get(playerId).onPlayerError();
                 }
-                error.printStackTrace();
+                t.printStackTrace();
             }
         });
     }
@@ -133,25 +136,26 @@ public class ProfileController {
         }
         pages.put(playerId, page);
 
-        Api.dribbble().userShots(playerId, page, new Callback<ArrayList<Shot>>() {
+        App.getClientApi().getDribbbleService().userShots(playerId, page).enqueue(new Callback<ArrayList<Shot>>() {
             @Override
-            public void success(ArrayList<Shot> newShots, Response response) {
+            public void onResponse(Call<ArrayList<Shot>> call, Response<ArrayList<Shot>> response) {
                 ArrayList<Shot> shotsList = shots.get(playerId);
                 if (shotsList != null) {
-                    shotsList.addAll(newShots);
+                    shotsList.addAll(response.body());
                 } else {
-                    shots.put(playerId, newShots);
+                    shots.put(playerId, response.body());
                 }
                 if (callbacks.get(playerId) != null) {
-                    callbacks.get(playerId).onShotsReceived(newShots.size() > 0, shots.get(playerId)); // TODO
+                    callbacks.get(playerId).onShotsReceived(response.body().size() > 0, shots.get(playerId)); // TODO
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ArrayList<Shot>> call, Throwable t) {
 
             }
         });
+
     }
 
     public interface OnPlayerDataListener {

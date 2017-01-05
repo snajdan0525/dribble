@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.snalopainen.data.api.Api;
+import com.snalopainen.data.app.App;
 import com.snalopainen.data.models.Shot;
 import com.snalopainen.data.models.ShotWrapper;
 import com.snalopainen.data.models.User;
@@ -12,9 +12,9 @@ import com.snalopainen.ui.shots.ShotsController;
 
 import java.util.ArrayList;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * @author snalopainen.
@@ -144,14 +144,14 @@ public class UserController {
     }
 
     public void loadFollowingShots() {
-        Api.dribbble().followingShots(name, followingPage, new Callback<ArrayList<ShotWrapper>>() {
+        App.getClientApi().getDribbbleService().followingShots(name, followingPage).enqueue(new Callback<ArrayList<ShotWrapper>>() {
             @Override
-            public void success(ArrayList<ShotWrapper> shots, Response response) {
-                shouldLoadMoreFollowing = shots.size() > 0; // TODO
+            public void onResponse(Call<ArrayList<ShotWrapper>> call, Response<ArrayList<ShotWrapper>> response) {
+                shouldLoadMoreFollowing = response.body().size() > 0; // TODO
                 if (followingShots == null) {
                     followingShots = new ArrayList<>();
                 }
-                for (ShotWrapper wrapper : shots) {
+                for (ShotWrapper wrapper : response.body()) {
                     followingShots.add(wrapper.getShot());
                 }
                 if (followingShotsCallback != null) {
@@ -160,23 +160,24 @@ public class UserController {
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ArrayList<ShotWrapper>> call, Throwable t) {
                 if (followingShotsCallback != null) {
                     followingShotsCallback.onShotsError();
                 }
             }
         });
+
     }
 
     public void loadLikesShots() {
-        Api.dribbble().likesShots(name, likesPage, new Callback<ArrayList<ShotWrapper>>() {
+        App.getClientApi().getDribbbleService().likesShots(name, likesPage).enqueue(new Callback<ArrayList<ShotWrapper>>() {
             @Override
-            public void success(ArrayList<ShotWrapper> shots, Response response) {
-                shouldLoadMoreLikes = shots.size() > 0; // TODO
+            public void onResponse(Call<ArrayList<ShotWrapper>> call, Response<ArrayList<ShotWrapper>> response) {
+                shouldLoadMoreLikes = response.body().size() > 0; // TODO
                 if (likesShots == null) {
                     likesShots = new ArrayList<>();
                 }
-                for (ShotWrapper wrapper : shots) {
+                for (ShotWrapper wrapper : response.body()) {
                     likesShots.add(wrapper.getShot());
                 }
                 if (likesShotsCallback != null) {
@@ -185,23 +186,24 @@ public class UserController {
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ArrayList<ShotWrapper>> call, Throwable t) {
                 if (likesShotsCallback != null) {
                     likesShotsCallback.onShotsError();
                 }
             }
         });
+
     }
 
     public void loadPlayerShots() {
-        Api.dribbble().userShots(name, playerPage, new Callback<ArrayList<Shot>>() {
+        App.getClientApi().getDribbbleService().userShots(name, playerPage).enqueue(new Callback<ArrayList<Shot>>() {
             @Override
-            public void success(ArrayList<Shot> shots, Response response) {
-                shouldLoadMorePlayerShots = shots.size() > 0; // TODO
+            public void onResponse(Call<ArrayList<Shot>> call, Response<ArrayList<Shot>> response) {
+                shouldLoadMorePlayerShots = response.body().size() > 0; // TODO
                 if (userShots == null) {
-                    userShots = shots;
+                    userShots = response.body();
                 } else {
-                    userShots.addAll(shots);
+                    userShots.addAll(response.body());
                 }
                 if (userShotsCallback != null) {
                     userShotsCallback.onShotsLoaded(userShots);
@@ -209,12 +211,13 @@ public class UserController {
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ArrayList<Shot>> call, Throwable t) {
                 if (userShotsCallback != null) {
                     userShotsCallback.onShotsError();
                 }
             }
         });
+
     }
 
     public interface OnPlayerReceivedListener {

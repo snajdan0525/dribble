@@ -6,104 +6,119 @@ import com.snalopainen.data.models.Shot;
 import com.snalopainen.data.models.ShotWrapper;
 import com.snalopainen.data.models.User;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
-import retrofit.Callback;
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * @author snalopainen.
  */
 public class Api {
-    private static RestAdapter restAdapter = new RestAdapter.Builder()
-            .setLogLevel(RestAdapter.LogLevel.FULL)
-            .setRequestInterceptor(new RequestInterceptor() {
-                @Override
-                public void intercept(RequestFacade request) {
-                    request.addHeader("Accept", "application/vnd.dribbble.v1.param+json");
-                    request.addHeader("Authorization", "Bearer 4e3e676ce2881d166900f7f0ba4f1c0c599f3126ff426c78e61fd3fc233b2a32");
-                }
-            })
-            .setEndpoint("https://api.dribbble.com/v1/")
-            .build();
-    private static DribbbleService dribbbleService = restAdapter.create(DribbbleService.class);
 
-    public static DribbbleService dribbble() {
+
+    public Api() {
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
+        httpClientBuilder.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Interceptor.Chain chain) throws IOException {
+                Request original = chain.request();
+
+                Request.Builder requestBuilder = original.newBuilder()
+                        .header("Authorization", "Bearer 4e3e676ce2881d166900f7f0ba4f1c0c599f3126ff426c78e61fd3fc233b2a32")
+                        .header("Accept", "application/vnd.dribbble.v1.param+json")
+                        .method(original.method(), original.body());
+
+                Request request = requestBuilder.build();
+                return chain.proceed(request);
+            }
+        });
+        OkHttpClient client = httpClientBuilder.build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.dribbble.com/v1/").client(client).addConverterFactory(GsonConverterFactory.create()).build();
+        dribbbleService = retrofit.create(DribbbleService.class);
+    }
+
+    private DribbbleService dribbbleService;
+
+    public DribbbleService getDribbbleService() {
         return dribbbleService;
     }
 
     public interface DribbbleService {
         @GET("/shots")
-        void shots(@Query("list") String param, @Query("page") int page,
-                   Callback<ArrayList<Shot>> callback);
+        Call<ArrayList<Shot>> shots(@Query("list") String param, @Query("page") int page);
 
         @GET("/shots/{id}")
-        void shot(@Path("id") int shotId, Callback<Shot> callback);
+        Call<Shot> shot(@Path("id") int shotId);
 
         @GET("/shots/{id}/rebounds")
-        void rebounds(@Path("id") int shotId, Callback<ShotsResponse> callback);
+        Call<ShotsResponse> rebounds(@Path("id") int shotId);
 
         @GET("/shots/{id}/comments")
-        void comments(@Path("id") int shotId, @Query("page") int page,
-                      Callback<ArrayList<Comment>> callback);
+        Call<ArrayList<Comment>> comments(@Path("id") int shotId, @Query("page") int page);
 
         @GET("/players/{id}/shots")
-        void userShots(@Path("id") int playerId, @Query("page") int page,
-                       Callback<ArrayList<Shot>> callback);
+        Call<ArrayList<Shot>> userShots(@Path("id") int playerId, @Query("page") int page);
 
         @GET("/users/{id}/shots/following")
-        void followingShots(@Path("id") int userId, @Query("page") int page,
-                            Callback<ArrayList<ShotWrapper>> callback);
+        Call<ArrayList<ShotWrapper>> followingShots(@Path("id") int userId, @Query("page") int page);
 
         @GET("/users/{id}/shots/likes")
-        void likesShots(@Path("id") int userId, @Query("page") int page,
-                        Callback<ArrayList<ShotWrapper>> callback);
+        Call<ArrayList<ShotWrapper>> likesShots(@Path("id") int userId, @Query("page") int page);
 
         @GET("/users/{id}")
-        void userProfile(@Path("id") int userId, Callback<User> callback);
+        Call<User> userProfile(@Path("id") int userId);
 
         @GET("/users/{id}/followers/")
-        void userFollowers(@Path("id") int userId, @Query("page") int page,
-                           Callback<UsersResponse> callback);
+        Call<UsersResponse> userFollowers(@Path("id") int userId, @Query("page") int page
+        );
 
         @GET("/users/{id}/following")
-        void userFollowing(@Path("id") int userId, @Query("page") int page,
-                           Callback<UsersResponse> callback);
+        Call<UsersResponse> userFollowing(@Path("id") int userId, @Query("page") int page
+        );
 
         @GET("/users/{id}/draftees")
-        void userDraftees(@Path("id") int userId, @Query("page") int page,
-                          Callback<UsersResponse> callback);
+        Call<UsersResponse> userDraftees(@Path("id") int userId, @Query("page") int page
+        );
 
         @GET("/users/{id}/shots")
-        void userShots(@Path("id") String userName, @Query("page") int page,
-                       Callback<ArrayList<Shot>> callback);
+        Call<ArrayList<Shot>> userShots(@Path("id") String userName, @Query("page") int page
+        );
 
         @GET("/users/{id}/following")
-        void followingShots(@Path("id") String userName, @Query("page") int page,
-                            Callback<ArrayList<ShotWrapper>> callback);
+        Call<ArrayList<ShotWrapper>> followingShots(@Path("id") String userName, @Query("page") int page
+        );
 
         @GET("/users/{id}/likes")
-        void likesShots(@Path("id") String userName, @Query("page") int page,
-                        Callback<ArrayList<ShotWrapper>> callback);
+        Call<ArrayList<ShotWrapper>> likesShots(@Path("id") String userName, @Query("page") int page
+        );
 
         @GET("/users/{id}")
-        void userProfile(@Path("id") String userName, Callback<User> callback);
+        Call<User> userProfile(@Path("id") String userName);
 
         @GET("/users/{id}/followers")
-        void userFollowers(@Path("id") String userName, @Query("page") int page,
-                           Callback<UsersResponse> callback);
+        Call<UsersResponse> userFollowers(@Path("id") String userName, @Query("page") int page
+        );
 
         @GET("/users/{id}/following")
-        void userFollowing(@Path("id") String userName, @Query("page") int page,
-                           Callback<UsersResponse> callback);
+        Call<UsersResponse> userFollowing(@Path("id") String userName, @Query("page") int page
+        );
 
         @GET("/users/{id}/draftees")
-        void userDraftees(@Path("id") String userName, @Query("page") int page,
-                          Callback<UsersResponse> callback);
+        Call<UsersResponse> userDraftees(@Path("id") String userName, @Query("page") int page
+        );
 
         @GET("/search")
         JsonObject search(@Query("q") String query, @Query("page") int page);

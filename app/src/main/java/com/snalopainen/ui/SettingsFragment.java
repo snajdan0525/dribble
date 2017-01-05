@@ -74,10 +74,4 @@ public class SettingsFragment extends Fragment {
         startActivity(i);
     }
 
-    @OnClick(R.id.designer)
-    void openDesigner() {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(getString(R.string.designer_link)));
-        startActivity(i);
-    }
 }
